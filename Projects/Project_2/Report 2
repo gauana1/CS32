@@ -1,0 +1,240 @@
+Gautam Anand
+Project 2
+Professor Smallberg
+405965589
+
+Implmentation
+For the implementation, in order to use a linked list, I used a doubly liked list that was ciruclar. In this case there were no head or tail nodes, and rather the dummy node contained pointers to the end and the beginning of the list. 
+
+Pseudocode
+
+Destrcutor
+Use a for loop to loop through the sequence. Create a temp node and set it equal to dummy next. Then set dummy next equal to the temp next, and then set the temp next prev to dummy, and this allows us to delete the pointer. Then after deleting the pointer to all the elements in the sequence, delete the dummy itself. 
+
+Copy Constructor 
+Set the size of the new object to zero. Create a dummy node that has next and prev pointers to itself. Use a for loop to iterate through the other object and increment a counter after inserting elements into the new array.
+
+Assignment Operator
+Make a copy of sequence and then swap. 
+
+Insert
+Check boundary conditions if pos less than zero, or pos greater than m_size, if that is true, return -1. If m size =0, make a new node, and then assign a pointer to point to dummy. Then set the new item value to the value. Set the temp next to item. Set temp prev  to item, set item prev to temp and set item next to temp. This inserts a node at the beginning of the list. For the more general case, the logic is the same except now a while loop is used in order to incremet the temp pointer so that it points to the right node before deleting. Increase the size and return the position inserted. 
+
+Insert(const ItemType& value)
+Create a temp pointer that points to dummy next. Check if m_size = 0, then insert that value at the beginning and increment pointer and return counter. If not, then use a while loop to set temp equal to the right pointer and then if the value is greater than value, break and insert, else continue incrementing until a greater value is found, or the end of the list is reached. 
+
+Erase
+For erase, there are 4 distinct cases that we have to take care of. First check if the arguments inputted are out of bounds, if so, return false. If the pos =0, or m_size =1, then make a temp node that points to dummy, and another temp node that points to temp next. Set temp next to temp2 next and set temp2 next prev to temp. Now delete temp2 and decrement size and return true. For the other case where erasing at the end of the list, follow the same process but just set temp2 next to point to temp prev prev to access teh back of the list. The general case increments temp to the position of interest and uses the same code to delete the values. 
+
+Remove
+Remove is trivial and calls erase and find in a while loop until find returns -1.
+
+Get
+Returns false if the position is out of bounds. Uses a for loop to increment through the linked list and set a pointer to the value of interest, then replace value with the value at that item and return true.
+
+Set
+Set is implemented very similar to get, but instead of storing the value, it replaces it at a certain position. 
+
+Find
+Set pos =-1, use a for loop to iterate through the linked list, and if there is a match with the value and a value of a node in a linked list, break and return the position. Else increment i. 
+
+Swap
+Create a temp node pointer and set the other.dummy to point to it. Then assign other.dummy to point to dummy. Then assign dummy to point to temp. Swap the sizes of eqch sequence with a temp variable. 
+
+Subsequence
+Check if the size of sequence 2 is greater than sequence 1, if so return -1. Get the value at position 0 of the second sequence in a variabel called temp2. Use a for loop to iterate through seq 1, and store the value of seq 1 in another temp called temp1. Compare values, if they match, then increment counter, if they dont then reset counter to zero. Check if condition if counter equal seq2 size, if so return the (position-counter). Else return -1. 
+
+Concat reverse
+Use a for loop to iterate through seq2, and insert values at the 0th spot in sequence. Do the same for seq1 and insert values at the 0th spot in sequence. 
+
+
+Test Cases
+#include "Sequence.h"
+#include <cassert>
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+int main()
+{
+        // constructor
+    Sequence a;
+
+    assert(a.empty() == 1); // empty = true
+    assert(a.size() == 0); // size = 0
+    
+    // copy constructor
+    Sequence a2 = a; // copying empty list
+    a2.dump(); // [empty]
+
+    // insert(value)
+    a.insert("i"); // insert into empty sequence
+    a.insert("love"); // insert at back, one-element list
+    a.insert("cats"); // insert at front
+    a.insert("so");
+    assert(a.size() == 4); // size = 4
+    
+    // copy constructor 
+    Sequence a3 = a;
+    a3.dump(); // cats i love so
+
+    // get
+    string str;
+    a.get(3, str);
+    assert(str == "much");
+    a.get(4, str);
+    assert(str == "so");
+
+    // insert(pos, value)
+    cerr << endl << "INSERT(POS, VALUE)" << endl;
+    Sequence b;
+    b.insert(0, "are"); // insert into empty sequence
+    b.insert(1, "than"); // insert at back, one-element list
+
+    b.get(1, str);
+    assert(str == "than");
+
+    b.insert(1, "better"); // insert middle
+
+    assert(b.size() == 3);
+    b.get(1, str);
+    assert(str == "better");
+    assert(b.insert(3, "dogs") == 3); // insert at back
+    assert(b.insert(0, "cats") == 0); // insert at front
+    assert(b.insert(-1, "meow") == -1); // out of bounds
+    assert(b.insert(6, "meow") == -1); // out of bounds
+
+    b.dump(); // cats are better than dogs
+    
+    // find
+    assert(b.find("better") == 2); // middle
+    assert(b.find("cats") == 0); // beginning
+    assert(b.find("dogs") == 4); // end
+    
+    // assignment operator
+    cerr << endl << "ASSIGNMENT OPERATOR" << endl;
+    Sequence b2;
+    b2.operator=(b);
+    b2.dump(); // cats are better than dogs
+    b2.set(4, "everything");
+    b.dump(); // cats are better than dogs
+    b2.dump(); // cats are better than everything
+
+    Sequence c;
+    c.insert("meow");
+    c.insert("meow");
+    c.insert("meow");
+    
+    // find pt.2
+    assert(c.find("meow") == 0); // multiple instances of the same word
+    assert(c.find("woof") == -1); // nonexistent
+    
+    // swap
+    cerr << endl << "SWAP" << endl;
+    c.swap(b);
+    b.dump(); // meow meow meow
+    c.dump(); // cats are better than dogs
+
+    // erase
+    cerr << endl << "ERASE" << endl;
+    assert(c.erase(-1) == 0); // out of bounds
+    c.erase(0); // erase at front
+    c.dump(); // are better than dogs
+    c.erase(3); // erase at back
+    c.dump(); // are better than
+    c.erase(1); // erase middle
+    c.dump(); // are than
+    c.erase(0);
+    c.dump(); // than
+    c.erase(0); // erase single item
+    c.dump(); // [empty]
+    assert(c.erase(0) == 0); // empty list
+
+    // remove
+    cerr << endl << "REMOVE" << endl;
+    b.insert(2, "woof"); // removing with a word in between
+    b.dump(); // meow meow woof meow
+    assert(b.remove("meow") == 3);
+    b.dump(); // woof
+    b.remove("woof");
+
+    b.insert("meow"); // removing a single word
+    assert(b.remove("meow") == 1);
+    b.dump(); // [empty]
+    
+    assert(b.remove("meow") == 0);  // removing an empty list
+    b.dump(); // [empty]
+    
+    // swap pt.2
+    cerr << endl << "SWAP PT.2" << endl;
+    
+    // swapping empty sequences
+    b.swap(c);
+    b.dump(); // [empty]
+    c.dump(); // [empty]
+    
+    // swapping one non-empty sequence with an empty sequence
+    b.insert("meow");
+    b.swap(c);
+    b.dump(); // [empty]
+    c.dump(); // meow
+    
+    assert(b.find("meow") == -1); // finding in an empty sequence
+
+    cerr << endl << "SET" << endl;
+    
+    Sequence d;
+    d.insert(0, "cats");
+    d.insert(1, "could");
+    d.insert(2, "rule");
+    d.insert(3, "the");
+    d.insert(4, "world");
+    
+    d.dump(); // cats could rule the world
+    
+    // set
+    assert(d.set(5, "meow") == 0); // out of bounds
+    assert(d.set(-1, "meow") == 0); // out of bounds
+    assert(d.set(0, "bow") == 1); // within bounds
+    d.dump(); // bow could rule the world
+    assert(d.set(1, "before") == 1);
+    d.dump(); // bow before rule the world
+    assert(d.set(2, "the") == 1);
+    d.dump(); // bow before the the world
+    assert(d.set(3, "cats") == 1);
+    d.dump(); // bow before the cats world
+    assert(d.set(4, "now") == 1);
+    d.dump(); // bow before the cats now
+    
+    d.insert(2, "bow");
+    d.insert(3, "before");
+    d.dump(); // bow before bow before the cats now
+    
+    // subsequence
+    cerr << endl << "SUBSEQUENCE" << endl;
+    
+    Sequence e;
+    e.insert(0, "bow");
+    e.insert(1, "before");
+    e.dump(); // bow before
+    
+    assert(subsequence(d, e) == 0);
+    e.insert(2, "the");
+    assert(subsequence(d, e) == 2);
+    
+    e.insert(3, "felines");
+    assert(subsequence(d, e) == -1);
+    
+    // concatReverse
+    Sequence h; // empty sequence
+    Sequence g; // result sequence 1
+    Sequence i; // result sequence 2
+    cout << "f : ";
+    cout << "g : ";
+    cout << "h: ";
+    
+    cout << 1 << endl;
+    e.dump(); // bow before the felines
+    concatReverse(f, e, g); // seq1 is empty
+}
